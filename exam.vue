@@ -1,15 +1,30 @@
 <template>
   <div>
     <header>
+<<<<<<< HEAD
       <h1>才豹学院单词默写报告</h1>
       <div class="back" v-if="view === 'exam' || view === 'report'">
         <el-button type="success" :disabled="isSubmit" @click="goBack()">返回</el-button>
       </div>
       <div class="back" v-else-if="view === 'pdf' && !isLecture">
+=======
+      <h1 v-if="userType==='teacher'">才豹学院单词默写报告</h1>
+      <div class="back" v-if="view === 'exam' || view === 'report'">
+        <el-button type="success" :disabled="isSubmit" @click="goBack()">返回</el-button>
+      </div>
+      <div class="back" v-else-if="view === 'pdf' && !isLecture && userType==='teacher'">
+>>>>>>> 4cca2b60dfbf88ad5725160064cfe46f0acc6911
         <el-button type="success" :disabled="isSubmit" @click="lecture()">已讲解</el-button>
       </div>
     </header>
     <div v-bind:class="[judgeClass() ,'main']" style="">
+<<<<<<< HEAD
+=======
+      <div v-if="view!=='pdf' && userType==='supervisor'">
+        <span v-if="saveTime">保存时间：{{saveTime | dateall}}</span>
+        <span v-if="saver">保存人：{{saver}}</span>
+      </div>
+>>>>>>> 4cca2b60dfbf88ad5725160064cfe46f0acc6911
       <div style="">
         <div class="tabel-head" style="">
           <div class="options" style="">
@@ -18,11 +33,23 @@
                 <span class="li-head">编号</span>
                 <span class="li-content copy-btn-pdf">{{No}}</span>
               </li>
+<<<<<<< HEAD
               <li>
                 <span class="li-head">学生</span>
                 <span class="li-content copy-btn-pdf">{{studentNo}} {{studentName}}</span>
               </li>
               <li>
+=======
+              <li v-if="userType==='teacher'">
+                <span class="li-head">学生</span>
+                <span class="li-content copy-btn-pdf">{{studentNo}} {{studentName}}</span>
+              </li>
+              <li v-else-if="userType==='supervisor'">
+                <span class="li-head">才豹号</span>
+                <span class="li-content copy-btn-pdf">{{studentNo}}</span>
+              </li>
+              <li v-if="userType==='teacher'">
+>>>>>>> 4cca2b60dfbf88ad5725160064cfe46f0acc6911
                 <span class="li-head">默写内容</span>
                 <span v-bind:class="[judgeFont(), 'li-content', 'copy-btn-pdf']" v-if="examType">{{examContent}} {{examType | stemName}} {{examRange}}</span>
               </li>
@@ -112,7 +139,12 @@
         </div>
       </div>
       <div class="submit-area" v-if="view === 'exam'">
+<<<<<<< HEAD
         <el-button type="primary" :disabled="isSubmit" @click="updateData()">朕已阅</el-button>
+=======
+        <el-button type="success" :disabled="isSubmit" @click="saveData()">保存</el-button>
+        <el-button type="danger" :disabled="isSubmit" @click="updateData()">朕已阅</el-button>
+>>>>>>> 4cca2b60dfbf88ad5725160064cfe46f0acc6911
       </div>
     </div>
   </div>
@@ -130,6 +162,10 @@ export default {
   data() {
     return {
       msg: '',
+<<<<<<< HEAD
+=======
+      userType: '',
+>>>>>>> 4cca2b60dfbf88ad5725160064cfe46f0acc6911
       reportData: '',
       testPackageList: [],
       studentName: '',
@@ -171,6 +207,10 @@ export default {
   },
   created() {
     this.view = this.$route.query.view
+<<<<<<< HEAD
+=======
+    this.userType = this.$route.query.userType
+>>>>>>> 4cca2b60dfbf88ad5725160064cfe46f0acc6911
     document.onkeyup = this.keyUp
   },
   mounted() {
@@ -309,8 +349,24 @@ export default {
       }
       this.totalScore = Math.round((total / all) * 50)
     },
+<<<<<<< HEAD
     updateData () {
       this.isSubmit = true
+=======
+    saveData () {
+      this.isSubmit = true
+      this.postData.IsSaving = true
+      let isDatasetOver = this.setPostData(this.testPackageList)
+      if (isDatasetOver === false) {
+        return false
+      }
+      console.log(this.postData)
+      this.submitData(this.postData)
+    },
+    updateData () {
+      this.isSubmit = true
+      this.postData.IsSaving = false
+>>>>>>> 4cca2b60dfbf88ad5725160064cfe46f0acc6911
       let isDatasetOver = this.setPostData(this.testPackageList)
       if (isDatasetOver === false) {
         return false
@@ -336,6 +392,14 @@ export default {
             }
           })
           that.gotoPdf()
+<<<<<<< HEAD
+=======
+        } else if (result.data.code === 1 && that.postData.IsSaving) {
+          that.isSubmit = false
+          let number = result.data.data.OtherCheckerDoingTestAssignmentList[0].No
+          that.$alert('当前还有编号为' + number + '的试卷正在批阅中，请继续完成批阅！')
+          that.postData.CheckingResultPackage.PackageItemList = []
+>>>>>>> 4cca2b60dfbf88ad5725160064cfe46f0acc6911
         } else {
           that.isSubmit = false
           that.postData.CheckingResultPackage.PackageItemList = []
@@ -350,7 +414,10 @@ export default {
     setPostData (data) {
       this.postData.token = VueCookie.get('teacherToken')
       this.postData.TAId = this.taid
+<<<<<<< HEAD
       this.postData.IsSaving = false
+=======
+>>>>>>> 4cca2b60dfbf88ad5725160064cfe46f0acc6911
       this.postData.CheckingResultPackage.OverallComment = this.OverallComment
       for (let i in data) {
         let obj = {}
@@ -403,7 +470,11 @@ export default {
         type = '英译中'
       }
       let part = this.levelToPart(this.range)
+<<<<<<< HEAD
       if (this.view === 'pdf') {
+=======
+      if (this.view === 'pdf' && this.userType === 'supervisor') {
+>>>>>>> 4cca2b60dfbf88ad5725160064cfe46f0acc6911
         window.document.title = this.studentName + startDate + examContent + 'P' + part + type + '-' + this.totalScore + '分'
       } else if (this.view === 'exam') {
         window.document.title = '编号：' + this.No
