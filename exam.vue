@@ -120,7 +120,8 @@
         </div>
       </div>
       <div class="submit-area" v-if="view === 'exam'">
-        <el-button type="primary" :disabled="isSubmit" @click="updateData()">朕已阅</el-button>
+        <el-button type="success" :disabled="isSubmit" @click="saveData()">保存</el-button>
+        <el-button type="danger" :disabled="isSubmit" @click="updateData()">朕已阅</el-button>
       </div>
     </div>
   </div>
@@ -319,8 +320,19 @@ export default {
       }
       this.totalScore = Math.round((total / all) * 50)
     },
+    saveData () {
+      this.isSubmit = true
+      this.postData.IsSaving = true
+      let isDatasetOver = this.setPostData(this.testPackageList)
+      if (isDatasetOver === false) {
+        return false
+      }
+      console.log(this.postData)
+      this.submitData(this.postData)
+    },
     updateData () {
       this.isSubmit = true
+      this.postData.IsSaving = false
       let isDatasetOver = this.setPostData(this.testPackageList)
       if (isDatasetOver === false) {
         return false
@@ -346,6 +358,11 @@ export default {
             }
           })
           that.gotoPdf()
+        } else if (result.data.code === 1 && that.postData.IsSaving) {
+          that.isSubmit = false
+          let number = result.data.data.OtherCheckerDoingTestAssignmentList[0].No
+          that.$alert('当前还有编号为' + number + '的试卷正在批阅中，请继续完成批阅！')
+          that.postData.CheckingResultPackage.PackageItemList = []
         } else {
           that.isSubmit = false
           that.postData.CheckingResultPackage.PackageItemList = []
@@ -360,7 +377,6 @@ export default {
     setPostData (data) {
       this.postData.token = VueCookie.get('teacherToken')
       this.postData.TAId = this.taid
-      this.postData.IsSaving = false
       this.postData.CheckingResultPackage.OverallComment = this.OverallComment
       for (let i in data) {
         let obj = {}
@@ -413,7 +429,7 @@ export default {
         type = '英译中'
       }
       let part = this.levelToPart(this.range)
-      if (this.view === 'pdf') {
+      if (this.view === 'pdf' && this.userType === 'supervisor') {
         window.document.title = this.studentName + startDate + examContent + 'P' + part + type + '-' + this.totalScore + '分'
       } else if (this.view === 'exam') {
         window.document.title = '编号：' + this.No
