@@ -1,15 +1,19 @@
 <template>
   <div>
     <header>
-      <h1>才豹学院单词默写报告</h1>
+      <h1 v-if="userType==='teacher'">才豹学院单词默写报告</h1>
       <div class="back" v-if="view === 'exam' || view === 'report'">
         <el-button type="success" :disabled="isSubmit" @click="goBack()">返回</el-button>
       </div>
-      <div class="back" v-else-if="view === 'pdf' && !isLecture">
+      <div class="back" v-else-if="view === 'pdf' && !isLecture && userType==='teacher'">
         <el-button type="success" :disabled="isSubmit" @click="lecture()">已讲解</el-button>
       </div>
     </header>
     <div v-bind:class="[judgeClass() ,'main']" style="">
+      <div v-if="view!=='pdf' && userType==='supervisor'">
+        <span v-if="saveTime">保存时间：{{saveTime | dateall}}</span>
+        <span v-if="saver">保存人：{{saver}}</span>
+      </div>
       <div style="">
         <div class="tabel-head" style="">
           <div class="options" style="">
@@ -18,11 +22,15 @@
                 <span class="li-head">编号</span>
                 <span class="li-content copy-btn-pdf">{{No}}</span>
               </li>
-              <li>
+              <li v-if="userType==='teacher'">
                 <span class="li-head">学生</span>
                 <span class="li-content copy-btn-pdf">{{studentNo}} {{studentName}}</span>
               </li>
-              <li>
+              <li v-else-if="userType==='supervisor'">
+                <span class="li-head">才豹号</span>
+                <span class="li-content copy-btn-pdf">{{studentNo}}</span>
+              </li>
+              <li v-if="userType==='teacher'">
                 <span class="li-head">默写内容</span>
                 <span v-bind:class="[judgeFont(), 'li-content', 'copy-btn-pdf']" v-if="examType">{{examContent}} {{examType | stemName}} {{examRange}}</span>
               </li>
@@ -130,6 +138,7 @@ export default {
   data() {
     return {
       msg: '',
+      userType: '',
       reportData: '',
       testPackageList: [],
       studentName: '',
@@ -171,6 +180,7 @@ export default {
   },
   created() {
     this.view = this.$route.query.view
+    this.userType = this.$route.query.userType
     document.onkeyup = this.keyUp
   },
   mounted() {
